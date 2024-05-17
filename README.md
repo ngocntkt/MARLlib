@@ -137,7 +137,7 @@ Please follow [this guide](https://marllib.readthedocs.io/en/latest/handbook/env
 > __Note__:
 > We recommend the gym version around 0.20.0.
 ```bash
-pip install "gym==0.20.0"
+conda install -c conda-forge gym=0.21.0
 ```
 
 #### 3. install patches (basic)
