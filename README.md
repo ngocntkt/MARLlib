@@ -139,7 +139,6 @@ Please follow [this guide](https://marllib.readthedocs.io/en/latest/handbook/env
 ```bash
 conda install -c conda-forge gym=0.21.0
 ```
-
 #### 3. install patches (basic)
 
 Fix bugs of RLlib using patches by running the following command:
@@ -147,6 +146,12 @@ Fix bugs of RLlib using patches by running the following command:
 ```bash
 $ cd /Path/To/MARLlib/marllib/patch
 $ python add_patch.py -y
+```
+> __Note__:
+> We might need to downgrade protobuf package to 3.20.x or lower
+```bash
+pip uninstall -y protobuf
+pip install 'protobuf>=3.20.0,<3.21.0'
 ```
 
 ### PyPI
