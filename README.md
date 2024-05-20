@@ -161,7 +161,7 @@ $ pip install --upgrade pip
 $ pip install marllib
 ```
 
-#### Open Issues: For installing the AirCombat environment
+### NOTE: Open Issues for installing the AirCombat environment
 After running the following command:
 ```bash
 pip install torch pymap3d jsbsim==1.1.6 geographiclib gym==0.20.0 wandb icecream setproctitle
