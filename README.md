@@ -161,6 +161,16 @@ $ pip install --upgrade pip
 $ pip install marllib
 ```
 
+#### Open Issues: For installing the AirCombat environment
+After running the following command:
+```bash
+pip install torch pymap3d jsbsim==1.1.6 geographiclib gym==0.20.0 wandb icecream setproctitle
+cd Path/To/MARLlib
+# we use commit 8c13fd6 on JBSim, version is not restricted but may trigger potential bugs
+git submodule add --force https://github.com/JSBSim-Team/jsbsim.git marllib/patch/aircombat/JBSim/data
+```
+It is necessary to copy the  ```data``` folder (JBSim/data) into the JSBSim folder. 
+
 ### Docker-based usage
 
 We provide a Dockerfile for building the MARLlib docker image in `MARLlib/docker/Dockerfile` and a devcontainer setup in `MARLlib/.devcontainer` folder. If you use the devcontainer, one thing to note is that you may need to customise certain arguments in `runArgs`  of `devcontainer.json` according to your hardware, for example the `--shm-size` argument.
