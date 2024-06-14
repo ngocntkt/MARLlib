@@ -252,6 +252,7 @@ class _Algo:
         Returns:
             _Algo
         """
+        
         if hyperparam_source in ["common", "test"]:
             rel_path = "algos/hyperparams/{}/{}.yaml".format(hyperparam_source, self.name)
         else:
@@ -259,6 +260,8 @@ class _Algo:
 
         if not os.path.exists(os.path.join(os.path.dirname(__file__), rel_path)):
             rel_path = "../../examples/config/algo_config/{}.yaml".format(self.name)
+
+        print("Rel_path: ", rel_path)
 
         with open(os.path.join(os.path.dirname(__file__), rel_path), "r") as f:
             algo_config_dict = yaml.load(f, Loader=yaml.FullLoader)
