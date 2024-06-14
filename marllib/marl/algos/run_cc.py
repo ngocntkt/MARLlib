@@ -64,9 +64,11 @@ def run_cc(exp_info, env, model, stop=None):
     ########################
     ### environment info ###
     ########################
-
+    
     env_info = env.get_env_info()
+    
     map_name = exp_info['env_args']['map_name']
+    print("Map_name: ", map_name)
     agent_name_ls = env.agents
     env_info["agent_name_ls"] = agent_name_ls
     env.close()
@@ -74,19 +76,34 @@ def run_cc(exp_info, env, model, stop=None):
     ######################
     ### space checking ###
     ######################
-
-    action_discrete = isinstance(env_info["space_act"], gym.spaces.Discrete) or isinstance(env_info["space_act"],
-                                                                                           gym.spaces.MultiDiscrete)
-    if action_discrete:
-        if exp_info["algorithm"] in ["maddpg"]:
-            raise ValueError(
-                "Algo -maddpg- only supports continuous action space, Env -{}- requires Discrete action space".format(
-                    exp_info["env"]))
-    else:  # continuous
-        if exp_info["algorithm"] in ["coma"]:
-            raise ValueError(
-                "Algo -coma- only supports discrete action space, Env -{}- requires continuous action space".format(
-                    exp_info["env"]))
+    if map_name[:4]!='MATE':
+        action_discrete = isinstance(env_info["space_act"], gym.spaces.Discrete) or isinstance(env_info["space_act"],
+                                                                                            gym.spaces.MultiDiscrete)
+        if action_discrete:
+            if exp_info["algorithm"] in ["maddpg"]:
+                raise ValueError(
+                    "Algo -maddpg- only supports continuous action space, Env -{}- requires Discrete action space".format(
+                        exp_info["env"]))
+        else:  # continuous
+            if exp_info["algorithm"] in ["coma"]:
+                raise ValueError(
+                    "Algo -coma- only supports discrete action space, Env -{}- requires continuous action space".format(
+                        exp_info["env"]))
+    else:
+        action_discrete_camera = isinstance(env_info["space_act_camera"], gym.spaces.Discrete) or isinstance(env_info["space_act_camera"],
+                                                                                            gym.spaces.MultiDiscrete)
+        action_discrete_target = isinstance(env_info["space_act_target"], gym.spaces.Discrete) or isinstance(env_info["space_act_target"],
+                                                                                            gym.spaces.MultiDiscrete)
+        if action_discrete_camera or action_discrete_target:
+            if exp_info["algorithm"] in ["maddpg"]:
+                raise ValueError(
+                    "Algo -maddpg- only supports continuous action space, Env -{}- requires Discrete action space".format(
+                        exp_info["env"]))
+        else:  # continuous
+            if exp_info["algorithm"] in ["coma"]:
+                raise ValueError(
+                    "Algo -coma- only supports discrete action space, Env -{}- requires continuous action space".format(
+                        exp_info["env"]))
 
     ######################
     ### policy sharing ###
@@ -122,10 +139,16 @@ def run_cc(exp_info, env, model, stop=None):
                 lambda agent_id, episode, **kwargs: shared_policy_name)
 
         else:
-            policies = {
-                "policy_{}".format(i): (None, env_info["space_obs"], env_info["space_act"], {}) for i in
-                groups
-            }
+            if map_name[:4]!='MATE':
+                policies = {
+                    "policy_{}".format(i): (None, env_info["space_obs"], env_info["space_act"], {}) for i in
+                    groups
+                }
+            else:
+                policies = {
+                    "policy_{}".format(i): (None, env_info["space_obs_camera"], env_info["space_act_camera"], {}) for i in
+                    range(env_info["num_agents"])
+                }
             policy_ids = list(policies.keys())
             policy_mapping_fn = tune.function(
                 lambda agent_id: "policy_{}_".format(agent_id.split("_")[0]))
@@ -149,11 +172,16 @@ def run_cc(exp_info, env, model, stop=None):
     if exp_info["algorithm"] in ["happo", "hatrpo"]:
         if not policy_mapping_info["one_agent_one_policy"]:
             raise ValueError("in {}, agent number too large, we disable no sharing function".format(map_name))
-
-        policies = {
-            "policy_{}".format(i): (None, env_info["space_obs"], env_info["space_act"], {}) for i in
-            range(env_info["num_agents"])
-        }
+        if map_name[:4]!='MATE':
+            policies = {
+                "policy_{}".format(i): (None, env_info["space_obs"], env_info["space_act"], {}) for i in
+                range(env_info["num_agents"])
+            }
+        else:
+            policies = {
+                "policy_{}".format(i): (None, env_info["space_obs_camera"], env_info["space_act_camera"], {}) for i in
+                range(env_info["num_agents"])
+            }
         policy_ids = list(policies.keys())
         policy_mapping_fn = tune.function(
             lambda agent_id: policy_ids[agent_name_ls.index(agent_id)])
